@@ -31,3 +31,38 @@ cacheSolve <- function(x, ...) {
   x$setsolve(s)
   s
 }
+
+makeCacheMatrix <- function(x = matrix()) {
+  # Initialize inverse to NULL
+  inv <- NULL
+  
+  # Custom object to hold matrix and inverse
+  matrix <- list(
+    # Set the matrix value
+    set = function(y) {
+      x <<- y
+      inv <<- NULL  # Reset inverse when matrix changes
+    },
+    # Get the matrix value
+    get = function() x,
+    # Set the inverse value (for internal use)
+    setinverse = function(inverse) inv <<- inverse,
+    # Get the cached inverse
+    getinverse = function() {
+      if (is.null(inv)) {
+        # Calculate inverse only if not already cached
+        inv <- solve(x)
+      }
+      return(inv)
+    }
+  )
+  
+  # Return the custom object
+  return(matrix)
+}
+
+cacheSolve <- function(matrix) {
+  # Get the inverse from the object's getinverse method
+  return(matrix$getinverse())
+}
+
